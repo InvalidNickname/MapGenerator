@@ -32,6 +32,10 @@ public class SplashScreen implements Screen {
         for (FileHandle file : files) {
             assetManager.load(file.path(), Texture.class);
         }
+        files = Gdx.files.internal("map_objects/").list();
+        for (FileHandle file : files) {
+            assetManager.load(file.path(), Texture.class);
+        }
     }
 
     public void setOnLoadListener(OnLoadListener onLoadListener) {

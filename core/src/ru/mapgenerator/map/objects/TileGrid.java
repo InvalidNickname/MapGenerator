@@ -2,6 +2,7 @@ package ru.mapgenerator.map.objects;
 
 import ru.mapgenerator.Parameters;
 import ru.mapgenerator.map.objects.tiles.Tile;
+import ru.mapgenerator.map.objects.tiles.Type;
 
 public class TileGrid {
 
@@ -15,7 +16,7 @@ public class TileGrid {
         width = grid[0].length;
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)
-                grid[i][j] = new Tile(Parameters.TILE_TYPE_WATER, j, i);
+                grid[i][j] = new Tile(Parameters.TILE_TYPE_WATER, Type.NO_ELEVATION, j, i);
     }
 
     public Tile getTile(int x, int y) {

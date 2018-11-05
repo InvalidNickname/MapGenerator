@@ -33,10 +33,10 @@ public class MapScreen implements Screen {
         camera = new OrthographicCamera(Parameters.SCREEN_WIDTH / 2f, Parameters.SCREEN_HEIGHT / 2f);
         float camX = Parameters.TILE_WIDTH * (0.5f + Parameters.MAP_WIDTH) / 2;
         float camY = 0.125f * Parameters.TILE_HEIGHT * (1 + 3 * Parameters.MAP_HEIGHT);
-        camera.zoom = 2.5f;
         camera.position.set(camX, camY, 0);
         camera.update();
         minZoom = camY * 2 / camera.viewportHeight;
+        camera.zoom = minZoom;
         Gdx.input.setInputProcessor(new MapInputProcessor(camera));
     }
 
@@ -62,8 +62,10 @@ public class MapScreen implements Screen {
             mapMode = Parameters.MAP_MODE_NORMAL;
         } else if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             mapMode = Parameters.MAP_MODE_TEMPERATURE;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.E)){
+        } else if (Gdx.input.isKeyPressed(Input.Keys.E)) {
             mapMode = Parameters.MAP_MODE_HEIGHT;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+            mapMode = Parameters.MAP_MODE_BIOMES;
         }
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             Vector3 touchPos = new Vector3();
