@@ -9,7 +9,7 @@ import static ru.mapgenerator.screens.MapScreen.minZoom;
 
 public class MapInputProcessor implements InputProcessor {
 
-    private OrthographicCamera camera;
+    private final OrthographicCamera camera;
 
     public MapInputProcessor(OrthographicCamera camera) {
         this.camera = camera;

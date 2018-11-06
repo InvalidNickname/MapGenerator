@@ -6,10 +6,10 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 public class DrawableString {
 
-    private float height;
-    private String text;
-    private BitmapFont font;
-    private int x, y;
+    private final float height;
+    private final String text;
+    private final BitmapFont font;
+    private final int x, y;
 
     public DrawableString(String text, BitmapFont font, int x, int y) {
         this.x = x;

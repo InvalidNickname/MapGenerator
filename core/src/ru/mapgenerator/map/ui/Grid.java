@@ -11,11 +11,10 @@ import ru.mapgenerator.map.objects.TileGrid;
 
 public class Grid {
 
-    private TileGrid tileGrid;
-    private int height, width;
+    private final TileGrid tileGrid;
+    private final int height, width;
     private int selectedX, selectedY;
-    private Main applicationListener;
-    private Texture selectedTexture;
+    private final Texture selectedTexture;
 
     public Grid(int height, int width) {
         this.height = height;
@@ -24,8 +23,7 @@ public class Grid {
         selectedY = -1;
         Generator generator = new Generator(height, width);
         tileGrid = generator.generate();
-        applicationListener = (Main) Gdx.app.getApplicationListener();
-        selectedTexture = applicationListener.assetManager.get("tiles/selected_hex.png");
+        selectedTexture = ((Main) Gdx.app.getApplicationListener()).assetManager.get("tiles/selected_hex.png");
         selectedTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 

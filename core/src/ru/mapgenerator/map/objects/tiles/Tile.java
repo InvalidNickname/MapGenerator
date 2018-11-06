@@ -12,15 +12,17 @@ import ru.mapgenerator.map.objects.TileGrid;
 
 public class Tile {
 
-    private int x, y, z;
-    private float tileX, tileY, temperature, latitude, longitude;
+    private final int x, y;
+    private final float tileX, tileY;
+    private final Texture texture, tempTexture;
+    private int z;
+    private float temperature, latitude, longitude;
     private float mathLatitude;
     private Type type;
-    private Texture texture, tempTexture;
-    private Main applicationListener;
+    private Color color;
     private River river;
 
-    public Tile(int type, int terrain, int x, int y) {
+    public Tile(TypeParameters.Type type, TypeParameters.Elevation terrain, int x, int y) {
         this.x = x;
         this.y = y;
 
@@ -35,22 +37,25 @@ public class Tile {
         if (longitude > 1) longitude = 2 - longitude;
         longitude = MathUtils.lerp(180, 0, longitude);
 
-        applicationListener = (Main) Gdx.app.getApplicationListener();
         this.type = new Type(type, terrain);
 
         // координаты для отрисовки
         tileX = (x + (y % 2 == 1 ? 0.5f : 0)) * Parameters.TILE_WIDTH;
         tileY = y * Parameters.TILE_HEIGHT - (y >> 1) * Parameters.TILE_HEIGHT / 2f - (y % 2 == 1 ? 0.25f * Parameters.TILE_HEIGHT : 0);
 
-        tempTexture = applicationListener.assetManager.get("tiles/basic_0.png");
+        texture = ((Main) Gdx.app.getApplicationListener()).assetManager.get("tiles/basic_hex.png");
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        tempTexture = ((Main) Gdx.app.getApplicationListener()).assetManager.get("tiles/basic_hex.png");
+        tempTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     public void render(SpriteBatch spriteBatch, int mode) {
         switch (mode) {
             case Parameters.MAP_MODE_NORMAL:
+                spriteBatch.setColor(color);
                 spriteBatch.draw(texture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
                 if (river != null) {
-                    //spriteBatch.draw(texture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
+                    spriteBatch.setColor(1, 1, 1, 1);
                     river.render(spriteBatch, tileX, tileY);
                 }
                 break;
@@ -58,44 +63,41 @@ public class Tile {
                 float temp = (temperature + Math.abs(Parameters.TEMPERATURE_MIN) + 1) / (Math.abs(Parameters.TEMPERATURE_MIN) + Math.abs(Parameters.TEMPERATURE_MAX) + 2);
                 spriteBatch.setColor(1, 1 - temp, 1 - temp, 1);
                 spriteBatch.draw(tempTexture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
-                spriteBatch.setColor(1, 1, 1, 1);
                 break;
             }
             case Parameters.MAP_MODE_HEIGHT: {
                 float temp = (float) z / (TileGrid.maxZ + 1);
                 spriteBatch.setColor(1 - temp, 1 - temp, 1, 1);
                 spriteBatch.draw(tempTexture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
-                spriteBatch.setColor(1, 1, 1, 1);
                 break;
             }
             case Parameters.MAP_MODE_BIOMES:
                 Color color = new Color(1, 1, 1, 1);
                 switch (type.getType()) {
-                    case Parameters.TILE_TYPE_OCEAN:
+                    case OCEAN:
                         color = new Color(0x55b2feff);
                         break;
-                    case Parameters.TILE_TYPE_PLAINS:
+                    case PLAINS:
                         color = new Color(0x00bf46ff);
                         break;
-                    case Parameters.TILE_TYPE_DESERT:
+                    case DESERT:
                         color = new Color(0xffd84aff);
                         break;
-                    case Parameters.TILE_TYPE_SEMI_DESERT:
+                    case SEMI_DESERT:
                         color = new Color(0xd2d84aff);
                         break;
-                    case Parameters.TILE_TYPE_JUNGLE:
+                    case JUNGLE:
                         color = new Color(0x00aa3fff);
                         break;
-                    case Parameters.TILE_TYPE_ICE:
+                    case ICE:
                         color = new Color(0xc5f7ffff);
                         break;
-                    case Parameters.TILE_TYPE_TAIGA:
+                    case TAIGA:
                         color = new Color(0x00b17fff);
                         break;
                 }
                 spriteBatch.setColor(color);
                 spriteBatch.draw(tempTexture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
-                spriteBatch.setColor(1, 1, 1, 1);
                 break;
         }
     }
@@ -120,9 +122,8 @@ public class Tile {
         return type;
     }
 
-    public void setType(int type, int terrain) {
-        texture = this.type.setType(type, terrain);
-        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    public void setType(TypeParameters.Type type, TypeParameters.Elevation terrain) {
+        color = this.type.setType(type, terrain);
     }
 
     public float getTileX() {

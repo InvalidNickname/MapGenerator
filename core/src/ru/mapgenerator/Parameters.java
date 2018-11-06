@@ -11,22 +11,6 @@ public class Parameters {
     public static final int MAP_WIDTH = 200;
     public static final int MAP_HEIGHT = 120;
 
-    public static final int TILE_TYPE_WATER = 0;
-    public static final int TILE_TYPE_LAND = 1;
-    public static final int TILE_TYPE_PLAINS = 2;
-    public static final int TILE_TYPE_OCEAN = 3;
-    public static final int TILE_TYPE_JUNGLE = 4;
-    public static final int TILE_TYPE_ICE = 5;
-    public static final int TILE_TYPE_TAIGA = 6;
-    public static final int TILE_TYPE_DESERT = 9;
-    public static final int TILE_TYPE_SEMI_DESERT = 10;
-
-    public static final int TILE_MEGATYPE_BASIC = 0;
-    public static final int TILE_MEGATYPE_PLAINS = 1;
-    public static final int TILE_MEGATYPE_WATER = 2;
-    public static final int TILE_MEGATYPE_ICE = 3;
-    public static final int TILE_MEGATYPE_DESERT = 4;
-
     public static final double LAND_PERCENT_MIN = 0.4;
     public static final double LAND_PERCENT_MAX = 0.45;
     public static final int LAND_BORDER = 5;

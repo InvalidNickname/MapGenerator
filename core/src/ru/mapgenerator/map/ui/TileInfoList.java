@@ -14,9 +14,9 @@ import ru.mapgenerator.utils.DrawableString;
 
 public class TileInfoList extends Actor {
 
-    private BitmapFont font;
+    private final BitmapFont font;
     private DrawableString tileCoordinates, tileType, tileTemperature;
-    private ShapeRenderer shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
 
     public TileInfoList() {
         shapeRenderer = new ShapeRenderer();

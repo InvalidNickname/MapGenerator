@@ -3,7 +3,6 @@ package ru.mapgenerator.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,10 +11,10 @@ import ru.mapgenerator.Parameters;
 
 public class SplashScreen implements Screen {
 
-    private SpriteBatch spriteBatch;
-    private OrthographicCamera camera;
-    private Texture bar, background;
-    private AssetManager assetManager;
+    private final SpriteBatch spriteBatch;
+    private final OrthographicCamera camera;
+    private final Texture bar, background;
+    private final AssetManager assetManager;
     private OnLoadListener onLoadListener;
 
     public SplashScreen(SpriteBatch spriteBatch) {
@@ -28,14 +27,12 @@ public class SplashScreen implements Screen {
     }
 
     private void loadData() {
-        FileHandle[] files = Gdx.files.internal("tiles/").list();
-        for (FileHandle file : files) {
-            assetManager.load(file.path(), Texture.class);
-        }
-        files = Gdx.files.internal("map_objects/").list();
-        for (FileHandle file : files) {
-            assetManager.load(file.path(), Texture.class);
-        }
+        assetManager.load("tiles/selected_hex.png", Texture.class);
+        assetManager.load("tiles/basic_hex.png", Texture.class);
+        assetManager.load("map_objects/river_0.png", Texture.class);
+        assetManager.load("map_objects/river_1.png", Texture.class);
+        assetManager.load("map_objects/river_2.png", Texture.class);
+        assetManager.load("map_objects/river_3.png", Texture.class);
     }
 
     public void setOnLoadListener(OnLoadListener onLoadListener) {

@@ -1,14 +1,14 @@
 package ru.mapgenerator.map.objects;
 
-import ru.mapgenerator.Parameters;
 import ru.mapgenerator.map.objects.tiles.Tile;
-import ru.mapgenerator.map.objects.tiles.Type;
+import ru.mapgenerator.map.objects.tiles.TypeParameters.Elevation;
+import ru.mapgenerator.map.objects.tiles.TypeParameters.Type;
 
 public class TileGrid {
 
     public static int maxZ;
-    private Tile[][] grid;
-    private int height, width;
+    private final Tile[][] grid;
+    private final int height, width;
 
     public TileGrid(Tile[][] grid) {
         this.grid = grid;
@@ -16,7 +16,7 @@ public class TileGrid {
         width = grid[0].length;
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)
-                grid[i][j] = new Tile(Parameters.TILE_TYPE_WATER, Type.NO_ELEVATION, j, i);
+                grid[i][j] = new Tile(Type.WATER, Elevation.NO, j, i);
     }
 
     public Tile getTile(int x, int y) {

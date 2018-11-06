@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import ru.mapgenerator.Parameters;
 import ru.mapgenerator.map.MapInputProcessor;
 import ru.mapgenerator.map.ui.Grid;
@@ -17,20 +17,20 @@ import ru.mapgenerator.map.ui.TileInfoList;
 public class MapScreen implements Screen {
 
     public static float minZoom;
-    private SpriteBatch spriteBatch;
-    private OrthographicCamera camera;
-    private Grid grid;
-    private Stage stage;
-    private TileInfoList tileInfoList;
+    private final SpriteBatch spriteBatch;
+    private final OrthographicCamera camera;
+    private final Grid grid;
+    private final Stage stage;
+    private final TileInfoList tileInfoList;
     private int mapMode;
 
     public MapScreen(SpriteBatch spriteBatch) {
         this.spriteBatch = spriteBatch;
         tileInfoList = new TileInfoList();
-        stage = new Stage(new ExtendViewport(Parameters.SCREEN_WIDTH, Parameters.SCREEN_HEIGHT));
+        stage = new Stage(new FitViewport(Parameters.SCREEN_WIDTH, Parameters.SCREEN_HEIGHT));
         stage.addActor(tileInfoList);
         grid = new Grid(Parameters.MAP_HEIGHT, Parameters.MAP_WIDTH);
-        camera = new OrthographicCamera(Parameters.SCREEN_WIDTH / 2f, Parameters.SCREEN_HEIGHT / 2f);
+        camera = new OrthographicCamera(stage.getViewport().getScreenWidth() / 2f, stage.getViewport().getScreenHeight() / 2f);
         float camX = Parameters.TILE_WIDTH * (0.5f + Parameters.MAP_WIDTH) / 2;
         float camY = 0.125f * Parameters.TILE_HEIGHT * (1 + 3 * Parameters.MAP_HEIGHT);
         camera.position.set(camX, camY, 0);

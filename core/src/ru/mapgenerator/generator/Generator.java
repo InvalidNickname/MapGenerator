@@ -5,7 +5,9 @@ import ru.mapgenerator.Parameters;
 import ru.mapgenerator.map.objects.River;
 import ru.mapgenerator.map.objects.TileGrid;
 import ru.mapgenerator.map.objects.tiles.Tile;
-import ru.mapgenerator.map.objects.tiles.Type;
+import ru.mapgenerator.map.objects.tiles.TypeParameters.Elevation;
+import ru.mapgenerator.map.objects.tiles.TypeParameters.Megatype;
+import ru.mapgenerator.map.objects.tiles.TypeParameters.Type;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -14,7 +16,7 @@ import static ru.mapgenerator.Parameters.*;
 public class Generator {
 
     private TileGrid tileGrid;
-    private int height, width;
+    private final int height, width;
     private int continentSize;
 
     public Generator(int height, int width) {
@@ -49,16 +51,16 @@ public class Generator {
         deleteAloneTiles();
         for (int i = 2; i < height - 3; i++)
             for (int j = 2; j < width - 3; j++)
-                if (tileGrid.getTile(j, i).getType().getType() == TILE_TYPE_WATER && tileSurroundedByType(TILE_TYPE_WATER, tileGrid.getTile(j, i)) == 2) {
-                    deleteTilePaths(TILE_TYPE_WATER, TILE_TYPE_LAND, tileGrid.getTile(j, i));
-                } else if (tileGrid.getTile(j, i).getType().getType() == TILE_TYPE_LAND && tileSurroundedByType(TILE_TYPE_LAND, tileGrid.getTile(j, i)) == 2) {
-                    deleteTilePaths(TILE_TYPE_LAND, TILE_TYPE_WATER, tileGrid.getTile(j, i));
+                if (tileGrid.getTile(j, i).getType().getType() == Type.WATER && tileSurroundedByType(Type.WATER, tileGrid.getTile(j, i)) == 2) {
+                    deleteTilePaths(Type.WATER, Type.LAND, tileGrid.getTile(j, i));
+                } else if (tileGrid.getTile(j, i).getType().getType() == Type.LAND && tileSurroundedByType(Type.LAND, tileGrid.getTile(j, i)) == 2) {
+                    deleteTilePaths(Type.LAND, Type.WATER, tileGrid.getTile(j, i));
                 }
         deleteAloneTiles();
         // подъем тайлов земли
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)
-                if (tileGrid.getTile(j, i).getType().getType() == Parameters.TILE_TYPE_LAND) {
+                if (tileGrid.getTile(j, i).getType().getType() == Type.LAND) {
                     tileGrid.getTile(j, i).setZ(tileGrid.getTile(j, i).getZ() + 1);
                 }
     }
@@ -68,8 +70,8 @@ public class Generator {
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getType() == TILE_TYPE_WATER && tileSurroundedByType(TILE_TYPE_LAND, tile) > 0) {
-                    tile.setType(Parameters.TILE_TYPE_OCEAN, Type.SMALL_ELEVATION);
+                if (tile.getType().getType() == Type.WATER && tileSurroundedByType(Type.LAND, tile) > 0) {
+                    tile.setType(Type.OCEAN, Elevation.SMALL);
                     tile.setZ(0);
                 }
             }
@@ -77,8 +79,8 @@ public class Generator {
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getType() == TILE_TYPE_WATER) {
-                    tile.setType(Parameters.TILE_TYPE_OCEAN, Type.MEDIUM_ELEVATION);
+                if (tile.getType().getType() == Type.WATER) {
+                    tile.setType(Type.OCEAN, Elevation.MEDIUM);
                     tile.setZ(0);
                 }
             }
@@ -86,7 +88,7 @@ public class Generator {
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getZ() == 2 && tile.getType().getType() == Parameters.TILE_TYPE_LAND) {
+                if (tile.getZ() == 2 && tile.getType().getType() == Type.LAND) {
                     setPlains(tile);
                 }
             }
@@ -94,7 +96,7 @@ public class Generator {
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getType() == Parameters.TILE_TYPE_LAND && tileSurroundedByType(TILE_TYPE_PLAINS, tile) > 0) {
+                if (tile.getType().getType() == Type.LAND && tileSurroundedByType(Type.PLAINS, tile) > 0) {
                     setPlains(tile);
                 }
             }
@@ -102,8 +104,8 @@ public class Generator {
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getType() == Parameters.TILE_TYPE_LAND) {
-                    tile.setType(Parameters.TILE_TYPE_OCEAN, Type.NO_ELEVATION);
+                if (tile.getType().getType() == Type.LAND) {
+                    tile.setType(Type.OCEAN, Elevation.NO);
                     tile.setZ(1);
                 }
             }
@@ -111,43 +113,43 @@ public class Generator {
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getMegatype() == Parameters.TILE_MEGATYPE_PLAINS && tile.getTemperature() > Parameters.DESERT_TEMPERATURE) {
-                    tile.setType(Parameters.TILE_TYPE_DESERT, tile.getType().getTerrain());
+                if (tile.getType().getMegatype() == Megatype.PLAINS && tile.getTemperature() > Parameters.DESERT_TEMPERATURE) {
+                    tile.setType(Type.DESERT, tile.getType().getTerrain());
                 }
             }
         // расширение пустынь
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tileSurroundedByMegatype(Parameters.TILE_MEGATYPE_DESERT, tile) > 4 && tile.getType().getType() != Parameters.TILE_TYPE_OCEAN) {
-                    tile.setType(Parameters.TILE_TYPE_DESERT, tile.getType().getTerrain());
+                if (tileSurroundedByMegatype(Megatype.DESERT, tile) > 4 && tile.getType().getType() != Type.OCEAN) {
+                    tile.setType(Type.DESERT, tile.getType().getTerrain());
                 }
             }
         // установка полупустынь
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tileSurroundedByMegatype(Parameters.TILE_MEGATYPE_PLAINS, tile) > 0 && tile.getType().getType() == Parameters.TILE_TYPE_DESERT) {
-                    tile.setType(Parameters.TILE_TYPE_SEMI_DESERT, tile.getType().getTerrain());
+                if (tileSurroundedByMegatype(Megatype.PLAINS, tile) > 0 && tile.getType().getType() == Type.DESERT) {
+                    tile.setType(Type.SEMI_DESERT, tile.getType().getTerrain());
                 }
             }
         // установка джунглей
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getMegatype() == Parameters.TILE_MEGATYPE_PLAINS && tile.getLatitude() >= 0 && tile.getLatitude() < MathUtils.random(25, 30)) {
-                    tile.setType(Parameters.TILE_TYPE_JUNGLE, tile.getType().getTerrain());
+                if (tile.getType().getMegatype() == Megatype.PLAINS && tile.getLatitude() >= 0 && tile.getLatitude() < MathUtils.random(25, 30)) {
+                    tile.setType(Type.JUNGLE, tile.getType().getTerrain());
                 }
             }
         // установка ледников и тайги
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getMegatype() != Parameters.TILE_MEGATYPE_WATER) {
+                if (tile.getType().getMegatype() != Megatype.WATER) {
                     if (tile.getTemperature() <= 0) {
-                        tile.setType(Parameters.TILE_TYPE_ICE, tile.getType().getTerrain());
+                        tile.setType(Type.ICE, tile.getType().getTerrain());
                     } else if (tile.getTemperature() < 5 && tile.getLatitude() > 60) {
-                        tile.setType(Parameters.TILE_TYPE_TAIGA, tile.getType().getTerrain());
+                        tile.setType(Type.TAIGA, tile.getType().getTerrain());
                     }
                 }
             }
@@ -158,9 +160,9 @@ public class Generator {
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getMegatype() != TILE_MEGATYPE_WATER
-                        && tile.getType().getMegatype() != TILE_MEGATYPE_ICE
-                        && tile.getType().getMegatype() != TILE_MEGATYPE_DESERT) {
+                if (tile.getType().getMegatype() != Megatype.WATER
+                        && tile.getType().getMegatype() != Megatype.ICE
+                        && tile.getType().getMegatype() != Megatype.DESERT) {
                     float factor = 0.125f * (tile.getZ() - 4f) / TileGrid.maxZ;
                     if (MathUtils.random(0, 1) < factor) {
                         int minZ = tile.getZ() + 1, minTile = 0;
@@ -168,9 +170,9 @@ public class Generator {
                             Tile neighbour = tileGrid.getNeighbour(k, j, i);
                             if (neighbour.getRiver() == null) {
                                 if (neighbour.getZ() < minZ
-                                        && neighbour.getType().getMegatype() != TILE_MEGATYPE_WATER
-                                        && neighbour.getType().getMegatype() != TILE_MEGATYPE_ICE
-                                        && neighbour.getType().getMegatype() != TILE_MEGATYPE_DESERT) {
+                                        && neighbour.getType().getMegatype() != Megatype.WATER
+                                        && neighbour.getType().getMegatype() != Megatype.ICE
+                                        && neighbour.getType().getMegatype() != Megatype.DESERT) {
                                     minZ = neighbour.getZ();
                                     minTile = k;
                                 }
@@ -182,9 +184,9 @@ public class Generator {
                         if (minZ != -1) {
                             Tile neighbour = tileGrid.getNeighbour(minTile, j, i);
                             tile.setRiver(new River(minTile));
-                            if (neighbour.getType().getMegatype() != Parameters.TILE_MEGATYPE_WATER
-                                    && neighbour.getType().getMegatype() != TILE_MEGATYPE_ICE
-                                    && neighbour.getType().getMegatype() != TILE_MEGATYPE_DESERT) {
+                            if (neighbour.getType().getMegatype() != Megatype.WATER
+                                    && neighbour.getType().getMegatype() != Megatype.ICE
+                                    && neighbour.getType().getMegatype() != Megatype.DESERT) {
                                 continueRiver(minTile, neighbour.getX(), neighbour.getY());
                             }
                         }
@@ -217,9 +219,9 @@ public class Generator {
         if (k != -1) {
             Tile neighbour = tileGrid.getNeighbour(k, x, y);
             tile.setRiver(new River(fromDst, k));
-            if (neighbour.getType().getMegatype() != Parameters.TILE_MEGATYPE_WATER
-                    && neighbour.getType().getMegatype() != TILE_MEGATYPE_ICE
-                    && neighbour.getType().getMegatype() != TILE_MEGATYPE_DESERT) {
+            if (neighbour.getType().getMegatype() != Megatype.WATER
+                    && neighbour.getType().getMegatype() != Megatype.ICE
+                    && neighbour.getType().getMegatype() != Megatype.DESERT) {
                 continueRiver(k, neighbour.getX(), neighbour.getY());
             }
         } else {
@@ -233,8 +235,8 @@ public class Generator {
         for (int k = 0; k < 6; k++) {
             neighbour = tileGrid.getNeighbour(k, x, y);
             if (neighbour.getRiver() == null
-                    && neighbour.getType().getMegatype() != TILE_MEGATYPE_ICE
-                    && neighbour.getType().getMegatype() != TILE_MEGATYPE_DESERT) {
+                    && neighbour.getType().getMegatype() != Megatype.ICE
+                    && neighbour.getType().getMegatype() != Megatype.DESERT) {
                 if (neighbour.getZ() < minZ) {
                     minZ = neighbour.getZ();
                     minTile = 0;
@@ -250,8 +252,8 @@ public class Generator {
         for (int k = 0; k < 6; k++) {
             neighbour = tileGrid.getNeighbour(k, x, y);
             if (neighbour.getRiver() == null
-                    && neighbour.getType().getMegatype() != TILE_MEGATYPE_ICE
-                    && neighbour.getType().getMegatype() != TILE_MEGATYPE_DESERT) {
+                    && neighbour.getType().getMegatype() != Megatype.ICE
+                    && neighbour.getType().getMegatype() != Megatype.DESERT) {
                 if (neighbour.getZ() == minZ) {
                     minZ = neighbour.getZ();
                     minTile++;
@@ -266,13 +268,13 @@ public class Generator {
 
     private void setPlains(Tile tile) {
         if (tile.getZ() > 8) {
-            tile.setType(Parameters.TILE_TYPE_PLAINS, Type.HIGH_ELEVATION);
+            tile.setType(Type.PLAINS, Elevation.HIGH);
         } else if (tile.getZ() > 5) {
-            tile.setType(Parameters.TILE_TYPE_PLAINS, Type.MEDIUM_ELEVATION);
+            tile.setType(Type.PLAINS, Elevation.MEDIUM);
         } else if (tile.getZ() > 2) {
-            tile.setType(Parameters.TILE_TYPE_PLAINS, Type.SMALL_ELEVATION);
+            tile.setType(Type.PLAINS, Elevation.SMALL);
         } else {
-            tile.setType(Parameters.TILE_TYPE_PLAINS, Type.NO_ELEVATION);
+            tile.setType(Type.PLAINS, Elevation.NO);
         }
     }
 
@@ -281,16 +283,16 @@ public class Generator {
         for (int i = 1; i < height - 2; i++)
             for (int j = 1; j < width - 2; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getType() == TILE_TYPE_WATER && tileSurroundedByType(TILE_TYPE_LAND, tile) == 6) {
-                    tile.setType(TILE_TYPE_LAND, Type.NO_ELEVATION);
-                } else if (tile.getType().getType() == TILE_TYPE_LAND && tileSurroundedByType(TILE_TYPE_WATER, tileGrid.getTile(j, i)) == 6) {
-                    tileGrid.getTile(j, i).setType(TILE_TYPE_WATER, Type.NO_ELEVATION);
+                if (tile.getType().getType() == Type.WATER && tileSurroundedByType(Type.LAND, tile) == 6) {
+                    tile.setType(Type.LAND, Elevation.NO);
+                } else if (tile.getType().getType() == Type.LAND && tileSurroundedByType(Type.WATER, tileGrid.getTile(j, i)) == 6) {
+                    tileGrid.getTile(j, i).setType(Type.WATER, Elevation.NO);
                 }
             }
     }
 
     // рекурсивное удаление гексов, имеющих только 2 соседей того же типа
-    private void deleteTilePaths(int type, int changeTo, Tile tile) {
+    private void deleteTilePaths(Type type, Type changeTo, Tile tile) {
         tileGrid.getTile(tile.getX(), tile.getY()).setType(changeTo, tile.getType().getTerrain());
         if (tileSurroundedByType(type, tile) == 2)
             for (int i = 0; i < 6; i++) {
@@ -301,7 +303,7 @@ public class Generator {
             }
     }
 
-    private int tileSurroundedByType(int type, Tile tile) {
+    private int tileSurroundedByType(Type type, Tile tile) {
         int count = 0;
         for (int i = 0; i < 6; i++)
             if (tileGrid.getNeighbour(i, tile.getX(), tile.getY()) != null)
@@ -310,7 +312,7 @@ public class Generator {
         return count;
     }
 
-    private int tileSurroundedByMegatype(int megatype, Tile tile) {
+    private int tileSurroundedByMegatype(Megatype megatype, Tile tile) {
         int count = 0;
         for (int i = 0; i < 6; i++)
             if (tileGrid.getNeighbour(i, tile.getX(), tile.getY()) != null)
@@ -325,7 +327,7 @@ public class Generator {
             int prevY = ThreadLocalRandom.current().nextInt(LAND_BORDER, height - LAND_BORDER - 1);
             // чтобы в каждой части карты было по центральной точке - убирает огромные океаны
             int prevX = ThreadLocalRandom.current().nextInt((int) (((double) i / size) * MAP_WIDTH), (int) (((double) (i + 1) / size) * MAP_WIDTH));
-            tileGrid.getTile(prevX, prevY).setType(TILE_TYPE_LAND, Type.NO_ELEVATION);
+            tileGrid.getTile(prevX, prevY).setType(Type.LAND, Elevation.NO);
             // построение континента вокруг центрального гекса
             for (int j = 0; j < continentSize; j++) {
                 int destination = ThreadLocalRandom.current().nextInt(0, 6);
@@ -342,8 +344,8 @@ public class Generator {
                         factor = Math.min(factor, (double) (MAP_HEIGHT - 1 - neighbour.getY() - OBLIGATORY_LAND_BORDER) / LAND_BORDER);
                     if (ThreadLocalRandom.current().nextDouble(0.1, 1) < factor) {
                         neighbour.setZ(neighbour.getZ() + 1);
-                        if (neighbour.getType().getType() != TILE_TYPE_LAND) {
-                            neighbour.setType(TILE_TYPE_LAND, Type.NO_ELEVATION);
+                        if (neighbour.getType().getType() != Type.LAND) {
+                            neighbour.setType(Type.LAND, Elevation.NO);
                         } else {
                             j--;
                         }
