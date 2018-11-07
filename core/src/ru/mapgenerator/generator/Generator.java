@@ -2,8 +2,8 @@ package ru.mapgenerator.generator;
 
 import com.badlogic.gdx.math.MathUtils;
 import ru.mapgenerator.Parameters;
+import ru.mapgenerator.map.TileGrid;
 import ru.mapgenerator.map.objects.River;
-import ru.mapgenerator.map.objects.TileGrid;
 import ru.mapgenerator.map.objects.tiles.Tile;
 import ru.mapgenerator.map.objects.tiles.TypeParameters.Elevation;
 import ru.mapgenerator.map.objects.tiles.TypeParameters.Megatype;
@@ -15,8 +15,8 @@ import static ru.mapgenerator.Parameters.*;
 
 public class Generator {
 
-    private TileGrid tileGrid;
     private final int height, width;
+    private TileGrid tileGrid;
     private int continentSize;
 
     public Generator(int height, int width) {
@@ -57,6 +57,19 @@ public class Generator {
                     deleteTilePaths(Type.LAND, Type.WATER, tileGrid.getTile(j, i));
                 }
         deleteAloneTiles();
+        // эрозия
+        for (int i = 2; i < height - 3; i++)
+            for (int j = 2; j < width - 3; j++) {
+                Tile tile = tileGrid.getTile(j, i);
+                for (int k = 0; k < 6; k++) {
+                    Tile neighbour = tileGrid.getNeighbour(k, j, i);
+                    if (neighbour != null)
+                        if (tile.getZ() - neighbour.getZ() > 3) {
+                            tile.setZ(tile.getZ() - 1);
+                            neighbour.setZ(neighbour.getZ() + 1);
+                        }
+                }
+            }
         // подъем тайлов земли
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)

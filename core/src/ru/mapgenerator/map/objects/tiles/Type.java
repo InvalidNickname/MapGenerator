@@ -135,6 +135,26 @@ public class Type {
         }
     }
 
+    Color getBiomeColor() {
+        switch (type) {
+            case OCEAN:
+                return new Color(0x55b2feff);
+            case PLAINS:
+                return new Color(0x00bf46ff);
+            case DESERT:
+                return new Color(0xffd84aff);
+            case SEMI_DESERT:
+                return new Color(0xd2d84aff);
+            case JUNGLE:
+                return new Color(0x00aa3fff);
+            case ICE:
+                return new Color(0xc5f7ffff);
+            case TAIGA:
+                return new Color(0x00b17fff);
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         switch (type) {

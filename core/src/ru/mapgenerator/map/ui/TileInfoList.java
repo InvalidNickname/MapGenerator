@@ -8,15 +8,17 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import ru.mapgenerator.Parameters;
 import ru.mapgenerator.map.objects.tiles.Tile;
 import ru.mapgenerator.utils.DrawableString;
+
+import static ru.mapgenerator.Parameters.MAP_HEIGHT;
+import static ru.mapgenerator.Parameters.MAP_WIDTH;
 
 public class TileInfoList extends Actor {
 
     private final BitmapFont font;
-    private DrawableString tileCoordinates, tileType, tileTemperature;
     private final ShapeRenderer shapeRenderer;
+    private DrawableString tileCoordinates, tileType, tileTemperature;
 
     public TileInfoList() {
         shapeRenderer = new ShapeRenderer();
@@ -30,8 +32,8 @@ public class TileInfoList extends Actor {
     }
 
     void setTile(Tile tile) {
-        String latitudeText = (int) tile.getLatitude() + (tile.getY() > Parameters.MAP_HEIGHT / 2 ? " °N" : " °S");
-        String longitudeText = (int) tile.getLongitude() + (tile.getX() > Parameters.MAP_WIDTH / 2 ? " °E" : " °W");
+        String latitudeText = (int) tile.getLatitude() + (tile.getY() > MAP_HEIGHT / 2 ? " °N" : " °S");
+        String longitudeText = (int) tile.getLongitude() + (tile.getX() > MAP_WIDTH / 2 ? " °E" : " °W");
         tileCoordinates = new DrawableString(latitudeText + " " + longitudeText, font, 20, 30);
         tileType = new DrawableString(tile.getStringType(), font, 20, 90);
         tileTemperature = new DrawableString((int) tile.getTemperature() + " °C", font, 20, 60);

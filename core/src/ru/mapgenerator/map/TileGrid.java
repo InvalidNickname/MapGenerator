@@ -1,4 +1,4 @@
-package ru.mapgenerator.map.objects;
+package ru.mapgenerator.map;
 
 import ru.mapgenerator.map.objects.tiles.Tile;
 import ru.mapgenerator.map.objects.tiles.TypeParameters.Elevation;

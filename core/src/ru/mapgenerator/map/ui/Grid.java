@@ -3,22 +3,23 @@ package ru.mapgenerator.map.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import ru.mapgenerator.Main;
 import ru.mapgenerator.Parameters;
 import ru.mapgenerator.generator.Generator;
-import ru.mapgenerator.map.objects.TileGrid;
+import ru.mapgenerator.map.TileGrid;
+
+import static ru.mapgenerator.Parameters.MAP_HEIGHT;
+import static ru.mapgenerator.Parameters.MAP_WIDTH;
 
 public class Grid {
 
     private final TileGrid tileGrid;
-    private final int height, width;
-    private int selectedX, selectedY;
     private final Texture selectedTexture;
+    private int selectedX, selectedY;
 
     public Grid(int height, int width) {
-        this.height = height;
-        this.width = width;
         selectedX = -1;
         selectedY = -1;
         Generator generator = new Generator(height, width);
@@ -27,26 +28,56 @@ public class Grid {
         selectedTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
-    public void render(SpriteBatch spriteBatch, int mode) {
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
-                tileGrid.getTile(j, i).render(spriteBatch, mode);
+    public void render(SpriteBatch spriteBatch, int mode, int x0, int y0, int x1, int y1) {
+        if (y0 < 0) y0 = 0;
+        if (y1 > MAP_HEIGHT - 1) y1 = MAP_HEIGHT - 1;
+        if (x0 < 0) {
+            for (int i = y0; i < y1; i++) {
+                for (int j = 0; j < x1; j++)
+                    tileGrid.getTile(j, i).render(spriteBatch, mode, j, i);
+                for (int j = MAP_WIDTH + x0; j < MAP_WIDTH; j++)
+                    tileGrid.getTile(j, i).render(spriteBatch, mode, j - MAP_WIDTH, i);
+            }
+        } else if (x1 > MAP_WIDTH) {
+            x1 = x1 % MAP_WIDTH;
+            for (int i = y0; i < y1; i++) {
+                for (int j = 0; j < x1; j++)
+                    tileGrid.getTile(j, i).render(spriteBatch, mode, j + MAP_WIDTH, i);
+                for (int j = x0; j < MAP_WIDTH; j++)
+                    tileGrid.getTile(j, i).render(spriteBatch, mode, j, i);
+            }
+        } else {
+            for (int i = y0; i < y1; i++)
+                for (int j = x0; j < x1; j++)
+                    tileGrid.getTile(j, i).render(spriteBatch, mode, j, i);
+        }
         // отрисовка выделения гекса
         if (selectedY >= 0 && selectedX >= 0) {
             spriteBatch.draw(selectedTexture,
                     tileGrid.getTile(selectedX, selectedY).getTileX(),
                     tileGrid.getTile(selectedX, selectedY).getTileY(),
-                    Parameters.TILE_WIDTH,
-                    Parameters.TILE_HEIGHT);
+                    Parameters.TILE_WIDTH + 0.5f,
+                    Parameters.TILE_HEIGHT + 0.5f);
         }
     }
 
     public void updateSelection(Vector3 touchPos, TileInfoList tileInfoList) {
-        float tempY = touchPos.y / (Parameters.TILE_HEIGHT / 2);
+        Vector2 tile = getTileByCoordinates(touchPos.x, touchPos.y);
+        tile.x = tile.x > MAP_WIDTH - 1 ? tile.x - MAP_WIDTH : (tile.x < 0 ? MAP_WIDTH + tile.x : tile.x);
+        if (tile.y >= 0 && tile.y < MAP_HEIGHT) {
+            selectedY = (int) tile.y;
+            selectedX = (int) tile.x;
+            tileInfoList.setTile(tileGrid.getTile(selectedX, selectedY));
+        }
+    }
+
+    public Vector2 getTileByCoordinates(float x, float y) {
+
+        float tempY = y / (Parameters.TILE_HEIGHT / 2);
         double relativeY = tempY - (int) (tempY / 1.5) * 1.5;
         int tileY;
 
-        float tempX = touchPos.x / (Parameters.TILE_WIDTH);
+        float tempX = x / (Parameters.TILE_WIDTH);
         double relativeX = tempX - (int) tempX;
         int tileX;
 
@@ -86,10 +117,6 @@ public class Grid {
             tileX = (int) (tempX - 0.5);
         }
 
-        if (tileX >= 0 && tileX < Parameters.MAP_WIDTH && tileY >= 0 && tileY < Parameters.MAP_HEIGHT) {
-            selectedY = tileY;
-            selectedX = tileX;
-            tileInfoList.setTile(tileGrid.getTile(selectedX, selectedY));
-        }
+        return new Vector2(tileX, tileY);
     }
 }

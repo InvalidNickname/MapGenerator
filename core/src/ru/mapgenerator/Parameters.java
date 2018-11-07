@@ -2,9 +2,6 @@ package ru.mapgenerator;
 
 public class Parameters {
 
-    public static final int SCREEN_WIDTH = 1920;
-    public static final int SCREEN_HEIGHT = 1080;
-
     public static final float TILE_HEIGHT = 80;
     public static final float TILE_WIDTH = (float) Math.sqrt(3) / 2 * TILE_HEIGHT;
 

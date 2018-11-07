@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import ru.mapgenerator.Main;
-import ru.mapgenerator.Parameters;
+
+import static ru.mapgenerator.Main.SCREEN_HEIGHT;
+import static ru.mapgenerator.Main.SCREEN_WIDTH;
 
 public class SplashScreen implements Screen {
 
@@ -23,7 +25,7 @@ public class SplashScreen implements Screen {
         background = new Texture(Gdx.files.internal("splashscreen/background.png"));
         bar = new Texture(Gdx.files.internal("splashscreen/bar.jpg"));
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, Parameters.SCREEN_WIDTH, Parameters.SCREEN_HEIGHT);
+        camera.setToOrtho(false, SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
     private void loadData() {
@@ -52,7 +54,7 @@ public class SplashScreen implements Screen {
         }
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        spriteBatch.draw(background, 0, 0, Parameters.SCREEN_WIDTH, Parameters.SCREEN_HEIGHT);
+        spriteBatch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         spriteBatch.draw(bar, 21, 21, 318 * assetManager.getProgress(), 21);
         spriteBatch.end();
     }
