@@ -30,7 +30,7 @@ public class Grid {
 
     public void render(SpriteBatch spriteBatch, int mode, int x0, int y0, int x1, int y1) {
         if (y0 < 0) y0 = 0;
-        if (y1 > MAP_HEIGHT - 1) y1 = MAP_HEIGHT - 1;
+        if (y1 > MAP_HEIGHT) y1 = MAP_HEIGHT;
         if (x0 < 0) {
             for (int i = y0; i < y1; i++) {
                 for (int j = 0; j < x1; j++)
@@ -78,7 +78,9 @@ public class Grid {
         int tileY;
 
         float tempX = x / (Parameters.TILE_WIDTH);
+        if (tempX < 0.5) tempX -= 1;
         double relativeX = tempX - (int) tempX;
+        if (relativeX < 0) relativeX++;
         int tileX;
 
         if (relativeY >= 0.5 && relativeY < 1.5)

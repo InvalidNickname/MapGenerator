@@ -14,6 +14,7 @@ public class DrawableString {
     public DrawableString(String text, BitmapFont font, int x, int y) {
         this.x = x;
         this.y = y;
+        if (text == null) text = "";
         this.text = text;
         this.font = font;
         GlyphLayout layout = new GlyphLayout();

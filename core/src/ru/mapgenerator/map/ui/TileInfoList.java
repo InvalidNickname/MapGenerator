@@ -29,6 +29,10 @@ public class TileInfoList extends Actor {
         font = generator.generateFont(parameter);
         font.setColor(Color.LIGHT_GRAY);
         generator.dispose();
+
+        tileCoordinates = new DrawableString(null, font, 20, 30);
+        tileType = new DrawableString("No tile selected", font, 20, 90);
+        tileTemperature = new DrawableString(null, font, 20, 60);
     }
 
     void setTile(Tile tile) {
@@ -42,19 +46,17 @@ public class TileInfoList extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        if (tileCoordinates != null) {
-            Gdx.gl.glEnable(GL30.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(0, 0, 0, 0.5f);
-            shapeRenderer.rect(0, 0, 320, 120);
-            shapeRenderer.end();
-            Gdx.gl.glDisable(GL30.GL_BLEND);
-            batch.end();
-            batch.begin();
-            tileCoordinates.render(batch);
-            tileType.render(batch);
-            tileTemperature.render(batch);
-        }
+        Gdx.gl.glEnable(GL30.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 0, 0, 0.5f);
+        shapeRenderer.rect(0, 0, 320, 120);
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL30.GL_BLEND);
+        batch.end();
+        batch.begin();
+        tileCoordinates.render(batch);
+        tileType.render(batch);
+        tileTemperature.render(batch);
     }
 }

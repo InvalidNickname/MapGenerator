@@ -93,16 +93,16 @@ public class MapScreen implements Screen {
             camera.zoom -= 0.02;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.getX() < 5) {
-            camera.translate(-3 * camera.zoom, 0, 0);
+            camera.translate(-6 * camera.zoom, 0, 0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.getX() > SCREEN_WIDTH - 5) {
-            camera.translate(3 * camera.zoom, 0, 0);
+            camera.translate(6 * camera.zoom, 0, 0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.getY() > SCREEN_HEIGHT - 5) {
-            camera.translate(0, -3 * camera.zoom, 0);
+            camera.translate(0, -6 * camera.zoom, 0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.getY() < 5) {
-            camera.translate(0, 3 * camera.zoom, 0);
+            camera.translate(0, 6 * camera.zoom, 0);
         }
         // ограничение зума
         if (camera.zoom < 0.5) camera.zoom = 0.5f;
@@ -114,9 +114,9 @@ public class MapScreen implements Screen {
             camera.position.y = (0.25f * Parameters.TILE_HEIGHT * (1 + 3 * MAP_HEIGHT)) - SCREEN_HEIGHT / 4f * camera.zoom;
         // бесконечная прокрутка по горизонтали
         if (camera.position.x <= -SCREEN_WIDTH * camera.zoom / 4)
-            camera.position.x = (Parameters.TILE_WIDTH * (0.5f + MAP_WIDTH)) - SCREEN_WIDTH / 4f * camera.zoom;
-        if (camera.position.x >= (Parameters.TILE_WIDTH * (0.5 + MAP_WIDTH)) + SCREEN_WIDTH * camera.zoom / 4)
-            camera.position.x = SCREEN_WIDTH * camera.zoom / 4;
+            camera.position.x = (Parameters.TILE_WIDTH * (MAP_WIDTH)) - SCREEN_WIDTH / 4f * camera.zoom;
+        if (camera.position.x >= (Parameters.TILE_WIDTH * (0.5f + MAP_WIDTH)) + SCREEN_WIDTH * camera.zoom / 4f)
+            camera.position.x = SCREEN_WIDTH * camera.zoom / 4f + Parameters.TILE_WIDTH * 0.5f;
     }
 
     @Override

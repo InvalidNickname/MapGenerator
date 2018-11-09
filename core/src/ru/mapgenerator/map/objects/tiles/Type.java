@@ -8,18 +8,18 @@ public class Type {
 
     private TypeParameters.Type type;
     private Megatype megatype;
-    private Elevation terrain;
+    private Elevation elevation;
 
-    Type(TypeParameters.Type type, Elevation terrain) {
-        setType(type, terrain);
+    Type(TypeParameters.Type type, Elevation elevation) {
+        setType(type, elevation);
     }
 
     public TypeParameters.Type getType() {
         return type;
     }
 
-    public Elevation getTerrain() {
-        return terrain;
+    public Elevation getElevation() {
+        return elevation;
     }
 
     private void setMegatype() {
@@ -49,7 +49,7 @@ public class Type {
     Color setType(TypeParameters.Type type, Elevation terrain) {
         this.type = type;
         setMegatype();
-        this.terrain = terrain;
+        this.elevation = terrain;
         switch (type) {
             case LAND:
                 return new Color(0xffffffff);
@@ -163,65 +163,65 @@ public class Type {
             case WATER:
                 return "Water";
             case OCEAN:
-                if (terrain == Elevation.NO)
+                if (elevation == Elevation.NO)
                     return "Shallow water";
-                else if (terrain == Elevation.SMALL)
+                else if (elevation == Elevation.SMALL)
                     return "Coast";
-                else if (terrain == Elevation.MEDIUM)
+                else if (elevation == Elevation.MEDIUM)
                     return "Ocean";
             case PLAINS:
-                if (terrain == Elevation.NO)
+                if (elevation == Elevation.NO)
                     return "Plains";
-                else if (terrain == Elevation.SMALL)
+                else if (elevation == Elevation.SMALL)
                     return "Hills";
-                else if (terrain == Elevation.MEDIUM)
+                else if (elevation == Elevation.MEDIUM)
                     return "High hills";
-                else if (terrain == Elevation.HIGH)
+                else if (elevation == Elevation.HIGH)
                     return "Mountains";
             case ICE:
-                if (terrain == Elevation.NO)
+                if (elevation == Elevation.NO)
                     return "Ice";
-                else if (terrain == Elevation.SMALL)
+                else if (elevation == Elevation.SMALL)
                     return "Icy hills";
-                else if (terrain == Elevation.MEDIUM)
+                else if (elevation == Elevation.MEDIUM)
                     return "Icy high hills";
-                else if (terrain == Elevation.HIGH)
+                else if (elevation == Elevation.HIGH)
                     return "Icy mountains";
             case DESERT:
-                if (terrain == Elevation.NO)
+                if (elevation == Elevation.NO)
                     return "Desert";
-                else if (terrain == Elevation.SMALL)
+                else if (elevation == Elevation.SMALL)
                     return "Desert hills";
-                else if (terrain == Elevation.MEDIUM)
+                else if (elevation == Elevation.MEDIUM)
                     return "High desert hills";
-                else if (terrain == Elevation.HIGH)
+                else if (elevation == Elevation.HIGH)
                     return "Dunes";
             case SEMI_DESERT:
-                if (terrain == Elevation.NO)
+                if (elevation == Elevation.NO)
                     return "Semi desert";
-                else if (terrain == Elevation.SMALL)
+                else if (elevation == Elevation.SMALL)
                     return "Semi desert hills";
-                else if (terrain == Elevation.MEDIUM)
+                else if (elevation == Elevation.MEDIUM)
                     return "High semi desert hills";
-                else if (terrain == Elevation.HIGH)
+                else if (elevation == Elevation.HIGH)
                     return "Semi desert mountains";
             case JUNGLE:
-                if (terrain == Elevation.NO)
+                if (elevation == Elevation.NO)
                     return "Jungle";
-                else if (terrain == Elevation.SMALL)
+                else if (elevation == Elevation.SMALL)
                     return "Jungle hills";
-                else if (terrain == Elevation.MEDIUM)
+                else if (elevation == Elevation.MEDIUM)
                     return "High jungle hills";
-                else if (terrain == Elevation.HIGH)
+                else if (elevation == Elevation.HIGH)
                     return "Jungle mountains";
             case TAIGA:
-                if (terrain == Elevation.NO)
+                if (elevation == Elevation.NO)
                     return "Taiga";
-                else if (terrain == Elevation.SMALL)
+                else if (elevation == Elevation.SMALL)
                     return "Taiga hills";
-                else if (terrain == Elevation.MEDIUM)
+                else if (elevation == Elevation.MEDIUM)
                     return "High taiga hills";
-                else if (terrain == Elevation.HIGH)
+                else if (elevation == Elevation.HIGH)
                     return "Taiga mountains";
             default:
                 return null;
