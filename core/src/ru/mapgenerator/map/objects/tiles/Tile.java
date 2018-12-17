@@ -1,7 +1,6 @@
 package ru.mapgenerator.map.objects.tiles;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -9,6 +8,8 @@ import ru.mapgenerator.Main;
 import ru.mapgenerator.Parameters;
 import ru.mapgenerator.map.TileGrid;
 import ru.mapgenerator.map.objects.River;
+import ru.mapgenerator.map.objects.coasts.Coastline;
+import ru.mapgenerator.map.objects.tiles.TypeParameters.Elevation;
 
 import static ru.mapgenerator.Parameters.MAP_HEIGHT;
 import static ru.mapgenerator.Parameters.MAP_WIDTH;
@@ -16,36 +17,28 @@ import static ru.mapgenerator.Parameters.MAP_WIDTH;
 public class Tile {
 
     private final int x, y;
+    private final Texture texture;
+    private final float latitude, longitude;
     private float tileX, tileY;
-    private final Texture texture, tempTexture;
     private int z;
-    private float temperature, latitude, longitude;
-    private float mathLatitude;
+    private float temperature;
     private Type type;
-    private Color color;
     private River river;
+    private Coastline coastline;
 
-    public Tile(TypeParameters.Type type, TypeParameters.Elevation terrain, int x, int y) {
+    public Tile(TypeParameters.Type type, Elevation terrain, int x, int y) {
         this.x = x;
         this.y = y;
 
-        // широта
-        mathLatitude = (float) 2 * y / MAP_HEIGHT;
-        if (mathLatitude > 1) mathLatitude = 2 - mathLatitude;
-        temperature = MathUtils.lerp(Parameters.TEMPERATURE_MIN, Parameters.TEMPERATURE_MAX, mathLatitude);
-        latitude = MathUtils.lerp(90, 0, mathLatitude);
-
-        // долгота
-        longitude = (float) 2 * x / MAP_WIDTH;
-        if (longitude > 1) longitude = 2 - longitude;
-        longitude = MathUtils.lerp(180, 0, longitude);
+        latitude = MathUtils.lerp(90, 0, 2f * y / MAP_HEIGHT > 1 ? 2 - 2f * y / MAP_HEIGHT : 2f * y / MAP_HEIGHT);
+        longitude = MathUtils.lerp(180, 0, 2f * x / MAP_WIDTH > 1 ? 2 - 2f * x / MAP_WIDTH : 2f * x / MAP_WIDTH);
 
         this.type = new Type(type, terrain);
 
         texture = ((Main) Gdx.app.getApplicationListener()).assetManager.get("tiles/basic_hex.png");
         texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        tempTexture = ((Main) Gdx.app.getApplicationListener()).assetManager.get("tiles/basic_hex.png");
-        tempTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        coastline = new Coastline(new boolean[]{false, false, false, false, false, false});
     }
 
     public void render(SpriteBatch spriteBatch, int mode, int x, int y) {
@@ -55,29 +48,29 @@ public class Tile {
 
         switch (mode) {
             case Parameters.MAP_MODE_NORMAL:
-                spriteBatch.setColor(color);
-                spriteBatch.draw(texture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
+                spriteBatch.setColor(type.getBaseColor());
+                spriteBatch.draw(texture, tileX, tileY, Parameters.TILE_WIDTH, Parameters.TILE_HEIGHT);
+                spriteBatch.setColor(1, 1, 1, 1);
+                coastline.render(spriteBatch, tileX, tileY);
                 if (river != null) {
-                    spriteBatch.setColor(1, 1, 1, 1);
                     river.render(spriteBatch, tileX, tileY);
                 }
                 break;
             case Parameters.MAP_MODE_TEMPERATURE: {
                 float temp = (temperature + Math.abs(Parameters.TEMPERATURE_MIN) + 1) / (Math.abs(Parameters.TEMPERATURE_MIN) + Math.abs(Parameters.TEMPERATURE_MAX) + 2);
                 spriteBatch.setColor(1, 1 - temp, 1 - temp, 1);
-                spriteBatch.draw(tempTexture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
+                spriteBatch.draw(texture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
                 break;
             }
             case Parameters.MAP_MODE_HEIGHT: {
-                float temp = (float) z / (TileGrid.maxZ + 1);
+                float temp = (float) z / (TileGrid.getMaxZ() + 1);
                 spriteBatch.setColor(1 - temp, 1 - temp, 1, 1);
-                spriteBatch.draw(tempTexture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
+                spriteBatch.draw(texture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
                 break;
             }
             case Parameters.MAP_MODE_BIOMES:
-                Color color = type.getBiomeColor();
-                spriteBatch.setColor(color);
-                spriteBatch.draw(tempTexture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
+                spriteBatch.setColor(type.getBiomeColor());
+                spriteBatch.draw(texture, tileX, tileY, Parameters.TILE_WIDTH + 0.5f, Parameters.TILE_HEIGHT + 0.5f);
                 break;
         }
     }
@@ -102,8 +95,12 @@ public class Tile {
         return type;
     }
 
-    public void setType(TypeParameters.Type type, TypeParameters.Elevation terrain) {
-        color = this.type.setType(type, terrain);
+    public void setType(TypeParameters.Type type) {
+        this.type.setType(type, this.type.getElevation());
+    }
+
+    public void setType(TypeParameters.Type type, Elevation terrain) {
+        this.type.setType(type, terrain);
     }
 
     public float getTileX() {
@@ -114,10 +111,6 @@ public class Tile {
         return tileY;
     }
 
-    public String getStringType() {
-        return type.toString();
-    }
-
     public int getZ() {
         return z;
     }
@@ -126,9 +119,13 @@ public class Tile {
         this.z = z;
     }
 
+    public void increaseZ(int x) {
+        z += x;
+    }
+
     public void setTemperature() {
-        temperature = MathUtils.lerp(Parameters.TEMPERATURE_MIN, Parameters.TEMPERATURE_MAX, mathLatitude);
-        temperature *= 1 - z / (TileGrid.maxZ + 1f);
+        temperature = MathUtils.lerp(Parameters.TEMPERATURE_MIN, Parameters.TEMPERATURE_MAX, 1 - latitude / 90f);
+        temperature *= 1 - z / (TileGrid.getMaxZ() + 1f);
         temperature += MathUtils.random(-1, 1);
     }
 
@@ -142,5 +139,9 @@ public class Tile {
 
     public void setRiver(River river) {
         this.river = river;
+    }
+
+    public void addCoast(int dest) {
+        coastline.addCoast(dest);
     }
 }

@@ -9,23 +9,23 @@ public class Type {
     private TypeParameters.Type type;
     private Megatype megatype;
     private Elevation elevation;
+    private Color baseColor, biomeColor;
 
     Type(TypeParameters.Type type, Elevation elevation) {
         setType(type, elevation);
     }
 
-    public TypeParameters.Type getType() {
-        return type;
-    }
-
-    public Elevation getElevation() {
-        return elevation;
+    void setType(TypeParameters.Type type, Elevation elevation) {
+        this.type = type;
+        this.elevation = elevation;
+        setMegatype();
+        setBaseColor();
+        setBiomeColor();
     }
 
     private void setMegatype() {
         switch (type) {
             case LAND:
-            case WATER:
                 megatype = Megatype.BASIC;
                 break;
             case OCEAN:
@@ -46,122 +46,149 @@ public class Type {
         }
     }
 
-    Color setType(TypeParameters.Type type, Elevation terrain) {
-        this.type = type;
-        setMegatype();
-        this.elevation = terrain;
+    private void setBaseColor() {
         switch (type) {
-            case LAND:
-                return new Color(0xffffffff);
-            case WATER:
-                return new Color(0x55b3ffff);
             case OCEAN:
-                switch (terrain) {
+                switch (elevation) {
                     case NO:
-                        return new Color(0x55d4ffff);
+                        baseColor = new Color(0x55d4ffff);
+                        break;
                     case SMALL:
-                        return new Color(0x55c7ffff);
+                        baseColor = new Color(0x55c7ffff);
+                        break;
                     case MEDIUM:
-                        return new Color(0x55b3ffff);
+                        baseColor = new Color(0x55b3ffff);
+                        break;
                 }
+                break;
             case PLAINS:
-                switch (terrain) {
+                switch (elevation) {
                     case NO:
-                        return new Color(0x00bf46ff);
+                        baseColor = new Color(0x00bf46ff);
+                        break;
                     case SMALL:
-                        return new Color(0x00b146ff);
+                        baseColor = new Color(0x00b146ff);
+                        break;
                     case MEDIUM:
-                        return new Color(0x00a746ff);
+                        baseColor = new Color(0x00a746ff);
+                        break;
                     case HIGH:
-                        return new Color(0x009c46ff);
+                        baseColor = new Color(0x009c46ff);
+                        break;
                 }
+                break;
             case ICE:
-                switch (terrain) {
+                switch (elevation) {
                     case NO:
-                        return new Color(0xc5f7ffff);
+                        baseColor = new Color(0xc5f7ffff);
+                        break;
                     case SMALL:
-                        return new Color(0xb4e4f4ff);
+                        baseColor = new Color(0xb4e4f4ff);
+                        break;
                     case MEDIUM:
-                        return new Color(0xcdedefff);
+                        baseColor = new Color(0xcdedefff);
+                        break;
                     case HIGH:
-                        return new Color(0xc3e3efff);
+                        baseColor = new Color(0xc3e3efff);
+                        break;
                 }
+                break;
             case DESERT:
-                switch (terrain) {
+                switch (elevation) {
                     case NO:
-                        return new Color(0xffd84aff);
+                        baseColor = new Color(0xffd84aff);
+                        break;
                     case SMALL:
-                        return new Color(0xfecd4aff);
+                        baseColor = new Color(0xfecd4aff);
+                        break;
                     case MEDIUM:
-                        return new Color(0xfbc640ff);
+                        baseColor = new Color(0xfbc640ff);
+                        break;
                     case HIGH:
-                        return new Color(0xfbb940ff);
+                        baseColor = new Color(0xfbb940ff);
+                        break;
                 }
+                break;
             case SEMI_DESERT:
-                switch (terrain) {
+                switch (elevation) {
                     case NO:
-                        return new Color(0xd2d84aff);
+                        baseColor = new Color(0xd2d84aff);
+                        break;
                     case SMALL:
-                        return new Color(0xc5d400ff);
+                        baseColor = new Color(0xc5d400ff);
+                        break;
                     case MEDIUM:
-                        return new Color(0xc3ca00ff);
+                        baseColor = new Color(0xc3ca00ff);
+                        break;
                     case HIGH:
-                        return new Color(0xc1c000ff);
+                        baseColor = new Color(0xc1c000ff);
+                        break;
                 }
+                break;
             case JUNGLE:
-                switch (terrain) {
+                switch (elevation) {
                     case NO:
-                        return new Color(0x00aa3fff);
+                        baseColor = new Color(0x00aa3fff);
+                        break;
                     case SMALL:
-                        return new Color(0x009f3fff);
+                        baseColor = new Color(0x009f3fff);
+                        break;
                     case MEDIUM:
-                        return new Color(0x00953fff);
+                        baseColor = new Color(0x00953fff);
+                        break;
                     case HIGH:
-                        return new Color(0x008b3fff);
+                        baseColor = new Color(0x008b3fff);
+                        break;
                 }
+                break;
             case TAIGA:
-                switch (terrain) {
+                switch (elevation) {
                     case NO:
-                        return new Color(0x00bf7fff);
+                        baseColor = new Color(0x00bf7fff);
+                        break;
                     case SMALL:
-                        return new Color(0x00b17fff);
+                        baseColor = new Color(0x00b17fff);
+                        break;
                     case MEDIUM:
-                        return new Color(0x00a77fff);
+                        baseColor = new Color(0x00a77fff);
+                        break;
                     case HIGH:
-                        return new Color(0x009c7fff);
+                        baseColor = new Color(0x009c7fff);
+                        break;
                 }
-            default:
-                return null;
+                break;
         }
     }
 
-    Color getBiomeColor() {
+    private void setBiomeColor() {
         switch (type) {
             case OCEAN:
-                return new Color(0x55b2feff);
+                biomeColor = new Color(0x55b2feff);
+                break;
             case PLAINS:
-                return new Color(0x00bf46ff);
+                biomeColor = new Color(0x00bf46ff);
+                break;
             case DESERT:
-                return new Color(0xffd84aff);
+                biomeColor = new Color(0xffd84aff);
+                break;
             case SEMI_DESERT:
-                return new Color(0xd2d84aff);
+                biomeColor = new Color(0xd2d84aff);
+                break;
             case JUNGLE:
-                return new Color(0x00aa3fff);
+                biomeColor = new Color(0x00aa3fff);
+                break;
             case ICE:
-                return new Color(0xc5f7ffff);
+                biomeColor = new Color(0xc5f7ffff);
+                break;
             case TAIGA:
-                return new Color(0x00b17fff);
+                biomeColor = new Color(0x00b17fff);
+                break;
         }
-        return null;
     }
 
     @Override
     public String toString() {
         switch (type) {
-            case LAND:
-                return "Land";
-            case WATER:
-                return "Water";
             case OCEAN:
                 if (elevation == Elevation.NO)
                     return "Shallow water";
@@ -228,8 +255,23 @@ public class Type {
         }
     }
 
+    Color getBiomeColor() {
+        return biomeColor;
+    }
+
+    Color getBaseColor() {
+        return baseColor;
+    }
+
     public Megatype getMegatype() {
         return megatype;
     }
 
+    public TypeParameters.Type getType() {
+        return type;
+    }
+
+    Elevation getElevation() {
+        return elevation;
+    }
 }

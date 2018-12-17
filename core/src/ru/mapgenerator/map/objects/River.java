@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import ru.mapgenerator.Main;
 import ru.mapgenerator.Parameters;
 
+import static ru.mapgenerator.utils.GridUtils.getRotation;
+
 public class River {
 
     private final float width, height;
@@ -17,9 +19,13 @@ public class River {
         this.toDst = toDst;
         textures = new Texture[4];
         textures[0] = ((Main) Gdx.app.getApplicationListener()).assetManager.get("map_objects/river_0.png");
+        textures[0].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         textures[1] = ((Main) Gdx.app.getApplicationListener()).assetManager.get("map_objects/river_1.png");
+        textures[1].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         textures[2] = ((Main) Gdx.app.getApplicationListener()).assetManager.get("map_objects/river_2.png");
+        textures[2].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         textures[3] = ((Main) Gdx.app.getApplicationListener()).assetManager.get("map_objects/river_3.png");
+        textures[3].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         width = Parameters.TILE_WIDTH;
         height = Parameters.TILE_HEIGHT;
     }
@@ -36,8 +42,8 @@ public class River {
         textures[2].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         textures[3] = ((Main) Gdx.app.getApplicationListener()).assetManager.get("map_objects/river_3.png");
         textures[3].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        width = Parameters.TILE_WIDTH + .5f;
-        height = Parameters.TILE_HEIGHT + .5f;
+        width = Parameters.TILE_WIDTH;
+        height = Parameters.TILE_HEIGHT;
     }
 
     public void render(SpriteBatch spriteBatch, float tileX, float tileY) {
@@ -67,25 +73,6 @@ public class River {
             float rotation = getRotation(fromDst);
             spriteBatch.draw(textures[0], tileX, tileY, width / 2f, height / 2f, width, height,
                     1, 1, rotation, 0, 0, textures[0].getWidth(), textures[0].getHeight(), false, false);
-        }
-    }
-
-    private float getRotation(int destination) {
-        switch (destination) {
-            case 0:
-                return 180;
-            case 1:
-                return 120;
-            case 2:
-                return 60;
-            case 3:
-                return 0;
-            case 4:
-                return 300;
-            case 5:
-                return 240;
-            default:
-                return 0;
         }
     }
 }

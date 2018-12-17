@@ -23,7 +23,13 @@ public class Grid {
         selectedX = -1;
         selectedY = -1;
         Generator generator = new Generator(height, width);
+
+        // DEBUG
+        generator.setSeed(2);
+        // DEBUG
+
         tileGrid = generator.generate();
+
         selectedTexture = ((Main) Gdx.app.getApplicationListener()).assetManager.get("tiles/selected_hex.png");
         selectedTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
@@ -31,6 +37,7 @@ public class Grid {
     public void render(SpriteBatch spriteBatch, int mode, int x0, int y0, int x1, int y1) {
         if (y0 < 0) y0 = 0;
         if (y1 > MAP_HEIGHT) y1 = MAP_HEIGHT;
+
         if (x0 < 0) {
             for (int i = y0; i < y1; i++) {
                 for (int j = 0; j < x1; j++)
@@ -56,8 +63,8 @@ public class Grid {
             spriteBatch.draw(selectedTexture,
                     tileGrid.getTile(selectedX, selectedY).getTileX(),
                     tileGrid.getTile(selectedX, selectedY).getTileY(),
-                    Parameters.TILE_WIDTH + 0.5f,
-                    Parameters.TILE_HEIGHT + 0.5f);
+                    Parameters.TILE_WIDTH,
+                    Parameters.TILE_HEIGHT);
         }
     }
 
@@ -100,13 +107,11 @@ public class Grid {
                 }
             else { // нечетный ряд
                 if (relativeX < 0.5) {
-                    relativeX += 0.5;
-                    if (relativeY < 1 - relativeX)
+                    if (relativeY < 0.5 - relativeX)
                         tileY = (int) (tempY / 1.5) - 1;
                     else tileY = (int) (tempY / 1.5);
                 } else {
-                    relativeX -= 0.5;
-                    if (relativeY / relativeX < 1)
+                    if (relativeY / (relativeX - 0.5) < 1)
                         tileY = (int) (tempY / 1.5) - 1;
                     else tileY = (int) (tempY / 1.5);
                 }

@@ -6,7 +6,7 @@ import ru.mapgenerator.map.objects.tiles.TypeParameters.Type;
 
 public class TileGrid {
 
-    public static int maxZ;
+    private static int maxZ;
     private final Tile[][] grid;
     private final int height, width;
 
@@ -16,7 +16,11 @@ public class TileGrid {
         width = grid[0].length;
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)
-                grid[i][j] = new Tile(Type.WATER, Elevation.NO, j, i);
+                grid[i][j] = new Tile(Type.OCEAN, Elevation.MEDIUM, j, i);
+    }
+
+    public static int getMaxZ() {
+        return maxZ;
     }
 
     public Tile getTile(int x, int y) {
@@ -29,6 +33,8 @@ public class TileGrid {
                 case 0:
                     if (x > 0)
                         return grid[y][x - 1];
+                    else
+                        return grid[y][width - 1];
                 case 1:
                     if (x > 0 && y < height - 1)
                         return grid[y + 1][x - 1];
@@ -50,6 +56,8 @@ public class TileGrid {
                 case 0:
                     if (x > 0)
                         return grid[y][x - 1];
+                    else
+                        return grid[y][width - 1];
                 case 1:
                     if (y < height - 1)
                         return grid[y + 1][x];
@@ -70,7 +78,7 @@ public class TileGrid {
         return null;
     }
 
-    public void setMaxHeight() {
+    public void findMaxHeight() {
         maxZ = getTile(0, 0).getZ();
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)

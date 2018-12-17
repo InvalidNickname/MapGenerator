@@ -39,7 +39,7 @@ public class TileInfoList extends Actor {
         String latitudeText = (int) tile.getLatitude() + (tile.getY() > MAP_HEIGHT / 2 ? " °N" : " °S");
         String longitudeText = (int) tile.getLongitude() + (tile.getX() > MAP_WIDTH / 2 ? " °E" : " °W");
         tileCoordinates = new DrawableString(latitudeText + " " + longitudeText, font, 20, 30);
-        tileType = new DrawableString(tile.getStringType(), font, 20, 90);
+        tileType = new DrawableString(tile.getType().toString(), font, 20, 90);
         tileTemperature = new DrawableString((int) tile.getTemperature() + " °C", font, 20, 60);
     }
 

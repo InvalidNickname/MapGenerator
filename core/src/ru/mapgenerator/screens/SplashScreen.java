@@ -35,6 +35,7 @@ public class SplashScreen implements Screen {
         assetManager.load("map_objects/river_1.png", Texture.class);
         assetManager.load("map_objects/river_2.png", Texture.class);
         assetManager.load("map_objects/river_3.png", Texture.class);
+        assetManager.load("map_objects/coast.png", Texture.class);
     }
 
     public void setOnLoadListener(OnLoadListener onLoadListener) {
