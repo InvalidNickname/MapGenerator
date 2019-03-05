@@ -38,18 +38,24 @@ public class TileGrid {
                 case 1:
                     if (x > 0 && y < height - 1)
                         return grid[y + 1][x - 1];
+                    else if (y < height - 1)
+                        return grid[y + 1][width - 1];
                 case 2:
                     if (y < height - 1)
                         return grid[y + 1][x];
                 case 3:
                     if (x < width - 1)
                         return grid[y][x + 1];
+                    else if (x == width - 1)
+                        return grid[y][0];
                 case 4:
                     if (y > 0)
                         return grid[y - 1][x];
                 case 5:
                     if (y > 0 && x > 0)
                         return grid[y - 1][x - 1];
+                    else if (y > 0)
+                        return grid[y - 1][width - 1];
             }
         } else {
             switch (destination) {
@@ -64,12 +70,18 @@ public class TileGrid {
                 case 2:
                     if (y < height - 1 && x < width - 1)
                         return grid[y + 1][x + 1];
+                    else if (y < height - 1)
+                        return grid[y + 1][0];
                 case 3:
                     if (x < width - 1)
                         return grid[y][x + 1];
+                    else
+                        return grid[y][0];
                 case 4:
                     if (y > 0 && x < width - 1)
                         return grid[y - 1][x + 1];
+                    else if (y > 0)
+                        return grid[y - 1][0];
                 case 5:
                     if (y > 0)
                         return grid[y - 1][x];

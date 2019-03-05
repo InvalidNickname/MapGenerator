@@ -3,13 +3,13 @@ package ru.mapgenerator.generator;
 import com.badlogic.gdx.math.MathUtils;
 import ru.mapgenerator.Parameters;
 import ru.mapgenerator.map.TileGrid;
-import ru.mapgenerator.map.objects.River;
 import ru.mapgenerator.map.objects.tiles.Tile;
 import ru.mapgenerator.map.objects.tiles.TypeParameters.Elevation;
 import ru.mapgenerator.map.objects.tiles.TypeParameters.Megatype;
 import ru.mapgenerator.map.objects.tiles.TypeParameters.Type;
 
-import static ru.mapgenerator.Parameters.*;
+import static ru.mapgenerator.Parameters.LAND_BORDER;
+import static ru.mapgenerator.Parameters.MAP_HEIGHT;
 
 public class Generator {
 
@@ -17,6 +17,7 @@ public class Generator {
     private TileGrid tileGrid;
     private int continentSize;
     private int seed; // для возможности вывода и использования в будущем
+    private int oceanLevel;
 
     public Generator(int height, int width) {
         this.height = height;
@@ -31,12 +32,13 @@ public class Generator {
     public TileGrid generate() {
         tileGrid = new TileGrid(new Tile[height][width]);
         // общее количество клеток суши
-        int landBudget = (int) (height * width * MathUtils.random(Parameters.LAND_PERCENT_MIN, Parameters.LAND_PERCENT_MAX));
+        int landBudget = height * width;
         // количество начальных точек континентов
-        int size = MathUtils.random(5, 7);
+        int size = MathUtils.random(50, 70);
         // точек в континенте
         continentSize = landBudget / size;
         raiseTerrain(size);
+        findOceanLevel();
         tileGrid.findMaxHeight();
         setTemperature();
         flattenTerrain();
@@ -48,19 +50,18 @@ public class Generator {
     private void setTemperature() {
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)
-                tileGrid.getTile(j, i).setTemperature();
+                tileGrid.getTile(j, i).setTemperature(oceanLevel);
+    }
+
+    private void findOceanLevel() {
+        long tileHeight = 0;
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++)
+                tileHeight += tileGrid.getTile(j, i).getZ();
+        oceanLevel = (int) (tileHeight / (height * width) * 1.2);
     }
 
     private void flattenTerrain() {
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
-                if (tileGrid.getTile(j, i).getType().getType() == Type.OCEAN && tileSurroundedByType(Type.OCEAN, tileGrid.getTile(j, i)) <= 2) {
-                    deleteTilePaths(Type.OCEAN, Type.LAND, tileGrid.getTile(j, i));
-                } else if (tileGrid.getTile(j, i).getType().getType() == Type.LAND && tileSurroundedByType(Type.LAND, tileGrid.getTile(j, i)) == 2) {
-                    deleteTilePaths(Type.LAND, Type.OCEAN, tileGrid.getTile(j, i));
-                }
-        deleteAloneTiles(Type.LAND, Type.OCEAN);
-        deleteAloneTiles(Type.OCEAN, Type.LAND);
         // эрозия
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
@@ -74,16 +75,33 @@ public class Generator {
                         }
                 }
             }
-        // подъем тайлов земли
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
-                if (tileGrid.getTile(j, i).getType().getType() == Type.LAND) {
-                    tileGrid.getTile(j, i).increaseZ(1);
-                }
+    }
+
+    private void flattenContinentBorders() {
+        for (int z = 0; z < 3; z++) {
+            for (int i = 0; i < height; i++)
+                for (int j = 0; j < width; j++)
+                    if (tileGrid.getTile(j, i).getType().getType() == Type.OCEAN && tileSurroundedByType(Type.OCEAN, tileGrid.getTile(j, i)) <= 2) {
+                        deleteTilePaths(Type.OCEAN, Type.LAND, tileGrid.getTile(j, i));
+                    } else if (tileGrid.getTile(j, i).getType().getType() == Type.LAND && tileSurroundedByType(Type.LAND, tileGrid.getTile(j, i)) == 2) {
+                        deleteTilePaths(Type.LAND, Type.OCEAN, tileGrid.getTile(j, i));
+                    }
+            deleteAloneTiles(Type.LAND, Type.OCEAN);
+            deleteAloneTiles(Type.OCEAN, Type.LAND);
+        }
     }
 
     private void setTerrainTypes() {
-        // установка побережья и океанов
+        // установка суши по уровню океана
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++) {
+                Tile tile = tileGrid.getTile(j, i);
+                if (tile.getZ() >= oceanLevel) {
+                    tile.setType(Type.LAND, Elevation.NO);
+                }
+            }
+        flattenContinentBorders();
+        // установка побережья
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
@@ -91,16 +109,15 @@ public class Generator {
                     if (tileSurroundedByType(Type.LAND, tile) > 0) {
                         tile.setType(Type.OCEAN, Elevation.SMALL);
                     } else {
-                        tile.setType(Type.OCEAN, Elevation.MEDIUM);
+                        setOceanDepth(tile);
                     }
-                    tile.setZ(0);
                 }
             }
         // установка лугов
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
-                if (tile.getZ() == 2 && tile.getType().getType() == Type.LAND) {
+                if (tile.getZ() == oceanLevel + 2 && tile.getType().getType() == Type.LAND) {
                     setPlains(tile);
                 }
             }
@@ -118,7 +135,6 @@ public class Generator {
                 Tile tile = tileGrid.getTile(j, i);
                 if (tile.getType().getType() == Type.LAND) {
                     tile.setType(Type.OCEAN, Elevation.NO);
-                    tile.setZ(1);
                 }
             }
         // установка пустынь
@@ -178,137 +194,26 @@ public class Generator {
     }
 
     private void setObjects() {
-        // расстановка рек
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++) {
-                Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getMegatype() != Megatype.WATER
-                        && tile.getType().getMegatype() != Megatype.ICE
-                        && tile.getType().getMegatype() != Megatype.DESERT) {
-                    float factor = 0.0625f * (tile.getZ() - 5f) / TileGrid.getMaxZ();
-                    if (MathUtils.random(0, 1) < factor) {
-                        int minZ = tile.getZ() + 1, minTile = 0;
-                        for (int k = 0; k < 6; k++) {
-                            Tile neighbour = tileGrid.getNeighbour(k, j, i);
-                            if (neighbour.getRiver() == null) {
-                                if (neighbour.getZ() < minZ
-                                        && neighbour.getType().getMegatype() != Megatype.WATER
-                                        && neighbour.getType().getMegatype() != Megatype.ICE
-                                        && neighbour.getType().getMegatype() != Megatype.DESERT) {
-                                    minZ = neighbour.getZ();
-                                    minTile = k;
-                                }
-                            } else {
-                                minZ = -1;
-                                break;
-                            }
-                        }
-                        if (minZ != -1) {
-                            Tile neighbour = tileGrid.getNeighbour(minTile, j, i);
-                            tile.setRiver(new River(minTile));
-                            continueRiver(minTile, neighbour.getX(), neighbour.getY());
-                        }
-                    }
-                }
-            }
-        // удаление рек длиной 1
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++) {
-                Tile tile = tileGrid.getTile(j, i);
-                if (tile.getRiver() != null) {
-                    int riverCount = 0;
-                    for (int k = 0; k < 6; k++) {
-                        if (tileGrid.getNeighbour(k, j, i).getRiver() != null) {
-                            riverCount++;
-                        }
-                    }
-                    if (riverCount == 0) {
-                        tile.setRiver(null);
-                    }
-                }
-            }
-        // расстановка побережий
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++) {
-                Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getMegatype() != Megatype.WATER) {
-                    for (int k = 0; k < 6; k++) {
-                        Tile neighbour = tileGrid.getNeighbour(k, j, i);
-                        if (neighbour != null && neighbour.getType().getMegatype() == Megatype.WATER) tile.addCoast(k);
-                    }
-                } else if (tile.getType().getMegatype() == Megatype.WATER) {
-                    for (int k = 0; k < 6; k++) {
-                        Tile neighbour = tileGrid.getNeighbour(k, j, i);
-                        if (neighbour != null && neighbour.getType().getMegatype() != Megatype.WATER) tile.addCoast(k);
-                    }
-                }
-            }
-    }
 
-    private void continueRiver(int fromDst, int x, int y) {
-        Tile tile = tileGrid.getTile(x, y);
-        fromDst += 3;
-        if (fromDst > 5) fromDst -= 6;
-        int k = getRandomNeighbourWithMinimumZ(fromDst, x, y);
-        if (k != -1) {
-            Tile neighbour = tileGrid.getNeighbour(k, x, y);
-            tile.setRiver(new River(fromDst, k));
-            if (neighbour.getType().getMegatype() != Megatype.WATER
-                    && neighbour.getType().getMegatype() != Megatype.ICE
-                    && neighbour.getType().getMegatype() != Megatype.DESERT) {
-                continueRiver(k, neighbour.getX(), neighbour.getY());
-            }
-        } else {
-            //tile.setType(TILE_TYPE_OCEAN, Type.SMALL_ELEVATION);
-        }
-    }
-
-    private int getRandomNeighbourWithMinimumZ(int fromDst, int x, int y) {
-        Tile neighbour;
-        int minZ = tileGrid.getTile(x, y).getZ() + 1, minTile = 0;
-        for (int k = 0; k < 6; k++) {
-            neighbour = tileGrid.getNeighbour(k, x, y);
-            if (neighbour.getRiver() == null
-                    && neighbour.getType().getMegatype() != Megatype.ICE
-                    && neighbour.getType().getMegatype() != Megatype.DESERT) {
-                if (neighbour.getZ() < minZ) {
-                    minZ = neighbour.getZ();
-                    minTile = 0;
-                } else if (neighbour.getZ() == minZ) {
-                    minTile++;
-                }
-            } else if (k != fromDst) {
-                return -1;
-            }
-        }
-        int random = MathUtils.random(1, minTile + 1);
-        minTile = 0;
-        for (int k = 0; k < 6; k++) {
-            neighbour = tileGrid.getNeighbour(k, x, y);
-            if (neighbour.getRiver() == null
-                    && neighbour.getType().getMegatype() != Megatype.ICE
-                    && neighbour.getType().getMegatype() != Megatype.DESERT) {
-                if (neighbour.getZ() == minZ) {
-                    minZ = neighbour.getZ();
-                    minTile++;
-                }
-                if (minTile == random) {
-                    return k;
-                }
-            }
-        }
-        return -1;
     }
 
     private void setPlains(Tile tile) {
-        if (tile.getZ() > 8) {
+        if (tile.getZ() > oceanLevel + 8) {
             tile.setType(Type.PLAINS, Elevation.HIGH);
-        } else if (tile.getZ() > 5) {
+        } else if (tile.getZ() > oceanLevel + 5) {
             tile.setType(Type.PLAINS, Elevation.MEDIUM);
-        } else if (tile.getZ() > 2) {
+        } else if (tile.getZ() > oceanLevel + 2) {
             tile.setType(Type.PLAINS, Elevation.SMALL);
         } else {
             tile.setType(Type.PLAINS, Elevation.NO);
+        }
+    }
+
+    private void setOceanDepth(Tile tile) {
+        if (tile.getZ() < oceanLevel - 10) {
+            tile.setType(Type.OCEAN, Elevation.HIGH);
+        } else {
+            tile.setType(Type.OCEAN, Elevation.MEDIUM);
         }
     }
 
@@ -357,7 +262,7 @@ public class Generator {
             // определение центрального гекса континента
             int prevY = MathUtils.random(LAND_BORDER, height - LAND_BORDER - 1);
             // чтобы в каждой части карты было по центральной точке - убирает огромные океаны
-            int prevX = MathUtils.random((int) (((double) i / size) * MAP_WIDTH), (int) (((i + 1f) / size) * MAP_WIDTH));
+            int prevX = MathUtils.random(0, width - 1);
             tileGrid.getTile(prevX, prevY).setType(Type.LAND, Elevation.NO);
             // построение континента вокруг центрального гекса
             for (int j = 0; j < continentSize; j++) {
@@ -365,24 +270,20 @@ public class Generator {
                 Tile neighbour = tileGrid.getNeighbour(destination, prevX, prevY);
                 if (neighbour != null) {
                     double factor = 1;
-                    if (neighbour.getX() < LAND_BORDER)
-                        factor = (double) (neighbour.getX() - OBLIGATORY_LAND_BORDER) / LAND_BORDER;
                     if (neighbour.getY() < LAND_BORDER)
-                        factor = Math.min(factor, (double) (neighbour.getY() - OBLIGATORY_LAND_BORDER) / LAND_BORDER);
-                    if (neighbour.getX() > MAP_WIDTH - LAND_BORDER - 1)
-                        factor = Math.min(factor, (double) (MAP_WIDTH - 1 - neighbour.getX() - OBLIGATORY_LAND_BORDER) / LAND_BORDER);
+                        factor = Math.min(factor, (double) neighbour.getY() / LAND_BORDER);
                     if (neighbour.getY() > MAP_HEIGHT - LAND_BORDER - 1)
-                        factor = Math.min(factor, (double) (MAP_HEIGHT - 1 - neighbour.getY() - OBLIGATORY_LAND_BORDER) / LAND_BORDER);
+                        factor = Math.min(factor, (double) (MAP_HEIGHT - 1 - neighbour.getY()) / LAND_BORDER);
                     if (MathUtils.random(0.1f, 1) < factor) {
                         neighbour.increaseZ(1);
-                        if (neighbour.getType().getType() != Type.LAND) {
-                            neighbour.setType(Type.LAND, Elevation.NO);
-                        } else {
+                        if (neighbour.getZ() > 0) {
                             j--;
                         }
                     }
                     prevX = neighbour.getX();
                     prevY = neighbour.getY();
+                } else {
+                    j--;
                 }
             }
         }

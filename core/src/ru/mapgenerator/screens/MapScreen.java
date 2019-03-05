@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -24,6 +25,7 @@ public class MapScreen implements Screen {
 
     public static float minZoom;
     private final SpriteBatch spriteBatch;
+    private final ShapeRenderer renderer;
     private final OrthographicCamera camera;
     private final Grid grid;
     private final Stage stage;
@@ -32,6 +34,8 @@ public class MapScreen implements Screen {
 
     public MapScreen(SpriteBatch spriteBatch) {
         this.spriteBatch = spriteBatch;
+        renderer = new ShapeRenderer();
+        renderer.setAutoShapeType(true);
         tileInfoList = new TileInfoList();
         stage = new Stage(new ScreenViewport());
         stage.addActor(tileInfoList);
@@ -58,11 +62,14 @@ public class MapScreen implements Screen {
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setProjectionMatrix(camera.combined);
         Vector3 lowerLeftCoordinates = camera.unproject(new Vector3(0, SCREEN_HEIGHT, 0));
         Vector2 lowerLeftTile = grid.getTileByCoordinates(lowerLeftCoordinates.x, lowerLeftCoordinates.y);
         Vector3 upperRightCoordinates = camera.unproject(new Vector3(SCREEN_WIDTH, 0, 0));
         Vector2 upperRightTile = grid.getTileByCoordinates(upperRightCoordinates.x, upperRightCoordinates.y);
-        grid.render(spriteBatch, mapMode, (int) lowerLeftTile.x - 1, (int) lowerLeftTile.y - 1, (int) upperRightTile.x + 2, (int) upperRightTile.y + 2);
+        grid.render(spriteBatch, renderer, mapMode, (int) lowerLeftTile.x - 1, (int) lowerLeftTile.y - 1, (int) upperRightTile.x + 2, (int) upperRightTile.y + 2);
+        renderer.end();
         spriteBatch.end();
         stage.draw();
     }

@@ -59,6 +59,9 @@ public class Type {
                     case MEDIUM:
                         baseColor = new Color(0x55b3ffff);
                         break;
+                    case HIGH:
+                        baseColor = new Color(0x4dafffff);
+                        break;
                 }
                 break;
             case PLAINS:
@@ -196,6 +199,8 @@ public class Type {
                     return "Coast";
                 else if (elevation == Elevation.MEDIUM)
                     return "Ocean";
+                else if (elevation == Elevation.HIGH)
+                    return "Deep ocean";
             case PLAINS:
                 if (elevation == Elevation.NO)
                     return "Plains";

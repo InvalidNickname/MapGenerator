@@ -4,6 +4,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import ru.mapgenerator.Main;
 
+@SuppressWarnings("WeakerAccess")
 public class DesktopLauncher {
 
     public static void main(String[] arg) {

@@ -30,7 +30,6 @@ public class SplashScreen implements Screen {
 
     private void loadData() {
         assetManager.load("tiles/selected_hex.png", Texture.class);
-        assetManager.load("tiles/basic_hex.png", Texture.class);
         assetManager.load("map_objects/river_0.png", Texture.class);
         assetManager.load("map_objects/river_1.png", Texture.class);
         assetManager.load("map_objects/river_2.png", Texture.class);

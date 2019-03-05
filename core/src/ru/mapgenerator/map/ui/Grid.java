@@ -3,6 +3,7 @@ package ru.mapgenerator.map.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import ru.mapgenerator.Main;
@@ -25,7 +26,7 @@ public class Grid {
         Generator generator = new Generator(height, width);
 
         // DEBUG
-        generator.setSeed(2);
+        //generator.setSeed(2);
         // DEBUG
 
         tileGrid = generator.generate();
@@ -34,29 +35,29 @@ public class Grid {
         selectedTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
-    public void render(SpriteBatch spriteBatch, int mode, int x0, int y0, int x1, int y1) {
+    public void render(SpriteBatch spriteBatch, ShapeRenderer renderer, int mode, int x0, int y0, int x1, int y1) {
         if (y0 < 0) y0 = 0;
         if (y1 > MAP_HEIGHT) y1 = MAP_HEIGHT;
 
         if (x0 < 0) {
             for (int i = y0; i < y1; i++) {
                 for (int j = 0; j < x1; j++)
-                    tileGrid.getTile(j, i).render(spriteBatch, mode, j, i);
+                    tileGrid.getTile(j, i).render(spriteBatch, renderer, mode, j, i);
                 for (int j = MAP_WIDTH + x0; j < MAP_WIDTH; j++)
-                    tileGrid.getTile(j, i).render(spriteBatch, mode, j - MAP_WIDTH, i);
+                    tileGrid.getTile(j, i).render(spriteBatch, renderer, mode, j - MAP_WIDTH, i);
             }
         } else if (x1 > MAP_WIDTH) {
             x1 = x1 % MAP_WIDTH;
             for (int i = y0; i < y1; i++) {
                 for (int j = 0; j < x1; j++)
-                    tileGrid.getTile(j, i).render(spriteBatch, mode, j + MAP_WIDTH, i);
+                    tileGrid.getTile(j, i).render(spriteBatch, renderer, mode, j + MAP_WIDTH, i);
                 for (int j = x0; j < MAP_WIDTH; j++)
-                    tileGrid.getTile(j, i).render(spriteBatch, mode, j, i);
+                    tileGrid.getTile(j, i).render(spriteBatch, renderer, mode, j, i);
             }
         } else {
             for (int i = y0; i < y1; i++)
                 for (int j = x0; j < x1; j++)
-                    tileGrid.getTile(j, i).render(spriteBatch, mode, j, i);
+                    tileGrid.getTile(j, i).render(spriteBatch, renderer, mode, j, i);
         }
         // отрисовка выделения гекса
         if (selectedY >= 0 && selectedX >= 0) {
