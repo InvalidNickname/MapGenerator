@@ -78,16 +78,14 @@ public class Generator {
     }
 
     private void flattenContinentBorders() {
-        for (int z = 0; z < 3; z++) {
+        for (int z = 0; z < 4; z++) {
             for (int i = 0; i < height; i++)
                 for (int j = 0; j < width; j++)
                     if (tileGrid.getTile(j, i).getType().getType() == Type.OCEAN && tileSurroundedByType(Type.OCEAN, tileGrid.getTile(j, i)) <= 2) {
-                        deleteTilePaths(Type.OCEAN, Type.LAND, tileGrid.getTile(j, i));
-                    } else if (tileGrid.getTile(j, i).getType().getType() == Type.LAND && tileSurroundedByType(Type.LAND, tileGrid.getTile(j, i)) == 2) {
-                        deleteTilePaths(Type.LAND, Type.OCEAN, tileGrid.getTile(j, i));
+                        deleteTilePaths(Type.OCEAN, Type.PLAINS, tileGrid.getTile(j, i));
+                    } else if (tileGrid.getTile(j, i).getType().getType() == Type.PLAINS && tileSurroundedByType(Type.PLAINS, tileGrid.getTile(j, i)) <= 2) {
+                        deleteTilePaths(Type.PLAINS, Type.OCEAN, tileGrid.getTile(j, i));
                     }
-            deleteAloneTiles(Type.LAND, Type.OCEAN);
-            deleteAloneTiles(Type.OCEAN, Type.LAND);
         }
     }
 
@@ -97,7 +95,7 @@ public class Generator {
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
                 if (tile.getZ() >= oceanLevel) {
-                    tile.setType(Type.LAND, Elevation.NO);
+                    setPlains(tile);
                 }
             }
         flattenContinentBorders();
@@ -106,35 +104,11 @@ public class Generator {
             for (int j = 0; j < width; j++) {
                 Tile tile = tileGrid.getTile(j, i);
                 if (tile.getType().getType() == Type.OCEAN) {
-                    if (tileSurroundedByType(Type.LAND, tile) > 0) {
-                        tile.setType(Type.OCEAN, Elevation.SMALL);
+                    if (tileSurroundedByType(Type.PLAINS, tile) > 0) {
+                        tile.setType(Type.OCEAN, Elevation.NO);
                     } else {
                         setOceanDepth(tile);
                     }
-                }
-            }
-        // установка лугов
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++) {
-                Tile tile = tileGrid.getTile(j, i);
-                if (tile.getZ() == oceanLevel + 2 && tile.getType().getType() == Type.LAND) {
-                    setPlains(tile);
-                }
-            }
-        // разглаживание лугов
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++) {
-                Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getType() == Type.LAND && tileSurroundedByType(Type.PLAINS, tile) > 0) {
-                    setPlains(tile);
-                }
-            }
-        // установка мелководья
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++) {
-                Tile tile = tileGrid.getTile(j, i);
-                if (tile.getType().getType() == Type.LAND) {
-                    tile.setType(Type.OCEAN, Elevation.NO);
                 }
             }
         // установка пустынь
@@ -198,11 +172,11 @@ public class Generator {
     }
 
     private void setPlains(Tile tile) {
-        if (tile.getZ() > oceanLevel + 8) {
+        if (tile.getZ() > oceanLevel + 15) {
             tile.setType(Type.PLAINS, Elevation.HIGH);
-        } else if (tile.getZ() > oceanLevel + 5) {
+        } else if (tile.getZ() > oceanLevel + 10) {
             tile.setType(Type.PLAINS, Elevation.MEDIUM);
-        } else if (tile.getZ() > oceanLevel + 2) {
+        } else if (tile.getZ() > oceanLevel + 5) {
             tile.setType(Type.PLAINS, Elevation.SMALL);
         } else {
             tile.setType(Type.PLAINS, Elevation.NO);
@@ -210,10 +184,12 @@ public class Generator {
     }
 
     private void setOceanDepth(Tile tile) {
-        if (tile.getZ() < oceanLevel - 10) {
+        if (tile.getZ() < oceanLevel - 15) {
             tile.setType(Type.OCEAN, Elevation.HIGH);
-        } else {
+        } else if (tile.getZ() < oceanLevel - 3) {
             tile.setType(Type.OCEAN, Elevation.MEDIUM);
+        } else {
+            tile.setType(Type.OCEAN, Elevation.SMALL);
         }
     }
 
@@ -263,7 +239,6 @@ public class Generator {
             int prevY = MathUtils.random(LAND_BORDER, height - LAND_BORDER - 1);
             // чтобы в каждой части карты было по центральной точке - убирает огромные океаны
             int prevX = MathUtils.random(0, width - 1);
-            tileGrid.getTile(prevX, prevY).setType(Type.LAND, Elevation.NO);
             // построение континента вокруг центрального гекса
             for (int j = 0; j < continentSize; j++) {
                 int destination = MathUtils.random(0, 6);

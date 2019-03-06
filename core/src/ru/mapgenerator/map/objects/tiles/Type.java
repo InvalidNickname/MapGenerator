@@ -51,16 +51,16 @@ public class Type {
             case OCEAN:
                 switch (elevation) {
                     case NO:
-                        baseColor = new Color(0x55d4ffff);
+                        baseColor = new Color(0x55c7ffff);
                         break;
                     case SMALL:
-                        baseColor = new Color(0x55c7ffff);
+                        baseColor = new Color(0x55c0ffff);
                         break;
                     case MEDIUM:
                         baseColor = new Color(0x55b3ffff);
                         break;
                     case HIGH:
-                        baseColor = new Color(0x4dafffff);
+                        baseColor = new Color(0x50afffff);
                         break;
                 }
                 break;
@@ -194,9 +194,9 @@ public class Type {
         switch (type) {
             case OCEAN:
                 if (elevation == Elevation.NO)
-                    return "Shallow water";
+                    return "Coastal waters";
                 else if (elevation == Elevation.SMALL)
-                    return "Coast";
+                    return "Shallow water";
                 else if (elevation == Elevation.MEDIUM)
                     return "Ocean";
                 else if (elevation == Elevation.HIGH)
